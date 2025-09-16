@@ -108,7 +108,7 @@ st.title("MIMIC-III Clinical Insights Dashboard")
 st.header("By Mithesh Ramachandran")
 st.caption("Interactive overview of demographics, admissions patterns, outcomes, and diagnoses. Filters on the left apply to all views.")
 
-t1,t2,t3,t4,t5,t6,t7,t8=st.tabs(["👤 Demographics","🏥 Admissions & Outcomes","🩺 Diagnoses","📑 Schema","📊 LOS Distribution","🏠 Discharge Analysis","⚖️ Insurance Equity","➡️ Patient Journeys"])
+t1,t2,t3,t4,t5,t6,t7,t8, t9=st.tabs(["Demographics","Admissions & Outcomes","Diagnoses","Schema","LOS Distribution","Discharge Analysis","Insurance Equity","Patient Journeys", "ICD Structure Map"])
 with t1:
     st.caption("This tab shows demographic breakdowns: age, gender, and ethnicity of admissions.")
     ac=pa_f.dropna(subset=["age_bin"]).groupby("age_bin")["hadm_id"].nunique().reset_index().rename(columns={"hadm_id":"adm"}).sort_values("age_bin")
@@ -266,4 +266,34 @@ with t8:
         fig = go.Figure(go.Sankey(node=dict(label=list(nodes), pad=20, thickness=20, line=dict(color="black", width=0.5)),
                                   link=dict(source=[l["source"] for l in links], target=[l["target"] for l in links], value=[l["value"] for l in links])))
         fig.update_layout(title="Patient Flow: Insurance → Discharge → Readmission", font=dict(size=14, family="Arial", color="black"))
+        st.plotly_chart(fig, use_container_width=True)
+
+with t9:
+    st.caption("This tab visualizes the ICD hierarchy as a Treemap: Chapter → Group → Diagnosis.")
+    if d.empty:
+        st.warning("No diagnosis data available.")
+    else:
+        d["icd9_code"] = d["icd9_code"].astype(str)
+        d["chapter"] = d["icd9_code"].str[0]
+        d["group"] = d["icd9_code"].str[:3]
+        d["diag"] = d["short_title"].fillna("Unknown")
+
+        diag_counts = d.groupby(["chapter","group","diag"]).size().reset_index(name="count")
+        fig = px.treemap(
+            diag_counts,path=["chapter","group","diag"],
+            values="count",title="ICD Diagnoses Treemap",
+            color="count",color_continuous_scale="RdBu",  
+            maxdepth=3
+        )
+
+        fig.update_traces(
+            textinfo="label+value",              
+            textfont=dict(size=16),  
+            marker=dict(line=dict(width=1, color="white")) 
+        )
+        fig.update_layout(
+            margin=dict(t=60, l=20, r=20, b=20),
+            height=800,                         
+            title_font=dict(size=22, family="Arial", color="black")
+        )
         st.plotly_chart(fig, use_container_width=True)
