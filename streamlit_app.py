@@ -266,6 +266,7 @@ with t8:
             c=j.groupby([s,t]).size().reset_index(name="cnt")
             for _,r in c.iterrows():
                 links.append(dict(source=idx[r[s]],target=idx[r[t]],value=r["cnt"]))
-        fig=go.Figure(go.Sankey(node=dict(label=list(nodes),pad=20,thickness=20),link=dict(source=[l["source"] for l in links],target=[l["target"] for l in links],value=[l["value"] for l in links])))
-        fig.update_layout(title="Patient Flow: Insurance → Discharge → Readmission",font_size=12)
+        fig=go.Figure(go.Sankey(node=dict(label=list(nodes),pad=20,thickness=20, line=dict(color="black", width=0.5),
+        font=dict(size=14, color="black", family="Arial")),link=dict(source=[l["source"] for l in links],target=[l["target"] for l in links],value=[l["value"] for l in links])))
+        fig.update_layout(title="Patient Flow: Insurance → Discharge → Readmission",font=dict(size=14, family="Arial", color="black"),font_size=12)
         st.plotly_chart(fig,use_container_width=True)
