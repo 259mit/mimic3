@@ -258,15 +258,10 @@ with t8:
     if "discharge_location" not in pa_f.columns:
         st.warning("No discharge data.")
     else:
-        j=pa_f.assign(disc=pa_f["discharge_location"].fillna("Unknown"),rd=np.where(pa_f["readmit"],"Readmitted <30d","No Readmit <30d"))[["insurance","disc","rd"]]
-        nodes=pd.unique(j[["insurance","disc","rd"]].values.ravel())
-        idx={n:i for i,n in enumerate(nodes)}
-        links=[]
-        for s,t in [("insurance","disc"),("disc","rd")]:
-            c=j.groupby([s,t]).size().reset_index(name="cnt")
-            for _,r in c.iterrows():
-                links.append(dict(source=idx[r[s]],target=idx[r[t]],value=r["cnt"]))
-        fig=go.Figure(go.Sankey(node=dict(label=list(nodes),pad=20,thickness=20, line=dict(color="black", width=0.5),
-        font=dict(size=14, color="black", family="Arial")),link=dict(source=[l["source"] for l in links],target=[l["target"] for l in links],value=[l["value"] for l in links])))
-        fig.update_layout(title="Patient Flow: Insurance → Discharge → Readmission",font=dict(size=14, family="Arial", color="black"),font_size=12)
-        st.plotly_chart(fig,use_container_width=True)
+        j = pa_f.assign(disc=pa_f["discharge_location"].fillna("Unknown"), rd=np.where(pa_f["readmit"], "Readmitted <30d", "No Readmit <30d"))[["insurance","disc","rd"]]
+        nodes = pd.unique(j[["insurance","disc","rd"]].values.ravel()); idx = {n:i for i,n in enumerate(nodes)}; links = []
+        for s,t in [("insurance","disc"),("disc","rd")]: 
+            for _,r in j.groupby([s,t]).size().reset_index(name="cnt").iterrows(): links.append(dict(source=idx[r[s]], target=idx[r[t]], value=r["cnt"]))
+        fig = go.Figure(go.Sankey(node=dict(label=list(nodes), pad=20, thickness=20, line=dict(color="black", width=0.5), font=dict(size=14, color="black", family="Arial")), link=dict(source=[l["source"] for l in links], target=[l["target"] for l in links], value=[l["value"] for l in links])))
+        fig.update_layout(title="Patient Flow: Insurance → Discharge → Readmission", font=dict(size=14, family="Arial", color="black"))
+        st.plotly_chart(fig, use_container_width=True)
