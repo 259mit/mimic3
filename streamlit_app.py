@@ -11,10 +11,10 @@ st.set_page_config(page_title="MIMIC-III Insights", layout="wide")
 
 st.sidebar.header("Data Sources")
 st.sidebar.text("Hosted on Streamlit CLoud")
-p_path = "/Users/mithesh/Downloads/MIMIC CN/PATIENTS.csv"
-a_path = "/Users/mithesh/Downloads/MIMIC CN/ADMISSIONS.csv"
-d_path = "/Users/mithesh/Downloads/MIMIC CN/DIAGNOSES_ICD.csv"
-dicd_path = "/Users/mithesh/Downloads/MIMIC CN/D_ICD_DIAGNOSES.csv"
+p_path = "PATIENTS.csv"
+a_path = "ADMISSIONS.csv"
+d_path = "DIAGNOSES_ICD.csv"
+dicd_path = "D_ICD_DIAGNOSES.csv"
 
 st.sidebar.markdown("---")
 st.sidebar.header("Filters")
